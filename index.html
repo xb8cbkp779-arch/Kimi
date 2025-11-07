@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11 Virtues Interactive Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .virtues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtue-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .virtue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .virtue-card.active {
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .virtue-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            color: white;
+        }
+
+        .virtue-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .virtue-description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .virtue-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .virtue-details.active {
+            max-height: 500px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .virtue-details.active .detail-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .virtue-details.active .detail-item:nth-child(1) { transition-delay: 0.1s; }
+        .virtue-details.active .detail-item:nth-child(2) { transition-delay: 0.2s; }
+        .virtue-details.active .detail-item:nth-child(3) { transition-delay: 0.3s; }
+        .virtue-details.active .detail-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 1s ease;
+            border-radius: 3px;
+        }
+
+        .virtue-card.active .progress-fill {
+            width: 100%;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .virtue-card:hover .virtue-icon {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>11 Virtues for Personal Excellence</h1>
+        <div class="virtues-grid" id="virtuesGrid"></div>
+    </div>
+
+    <script>
+        const virtues = [
+            {
+                name: "Critical Thinking",
+                icon: "🧠",
+                description: "The art of analyzing and evaluating thinking with a view to improving it",
+                details: [
+                    "Real-time monitoring of own thinking",
+                    "Reasoning that holds up to challenge and stays consistent",
+                    "Reduce bias via monitoring of own thinking",
+                    "Contradiction-free conclusions"
+                ]
+            },
+            {
+                name: "Sense-Making",
+                icon: "🔍",
+                description: "Creating coherent understanding from complex information",
+                details: [
+                    "Single contradiction-free narrative",
+                    "Metacognition treated as evidence",
+                    "Assimilate allocentric perspectives",
+                    "Decisions run on tested mental models"
+                ]
+            },
+            {
+                name: "Self-Control",
+                icon: "⚖️",
+                description: "The ability to regulate one's emotions, thoughts, and behavior",
+                details: [
+                    "Inhibit impulsive actions",
+                    "Delay gratification as default exchange",
+                    "Goal pursuit without hedonic reward",
+                    "Maintain selective attention despite noise"
+                ]
+            },
+            {
+                name: "Fairness",
+                icon: "⚖️",
+                description: "Treating people equally without favoritism or discrimination",
+                details: [
+                    "Equity = contribution ± need",
+                    "Engage in relational repair",
+                    "Uphold effort reciprocity",
+                    "Enforce rules with universality"
+                ]
+            },
+            {
+                name: "Impartiality",
+                icon: "🎯",
+                description: "Being unbiased and objective in judgment and decision-making",
+                details: [
+                    "Anchor judgments in empirical facts",
+                    "Logic survives name-blank test",
+                    "Debiasing: pre-mortem / steel-man / outside view",
+                    "Intellectual humility rises as data falls"
+                ]
+            },
+            {
+                name: "Strength & Courage",
+                icon: "💪",
+                description: "The ability to face fear, pain, or adversity with confidence",
+                details: [
+                    "Endure distress tolerance",
+                    "Confront phobias via exposure",
+                    "Stress inoculation via graduated load",
+                    "Anti-fragility gained from controlled stressors"
+                ]
+            },
+            {
+                name: "Autonomy",
+                icon: "🦅",
+                description: "The capacity to make an informed, uncoerced decision",
+                details: [
+                    "Choices guided by eudaimonic values",
+                    "Integrity overrides conformity pressure",
+                    "Exercise moral agency",
+                    "Harm never offloaded for gain"
+                ]
+            },
+            {
+                name: "Self-Confidence",
+                icon: "⭐",
+                description: "Trust in one's own abilities, qualities, and judgment",
+                details: [
+                    "Self-efficacy built on verifiable wins",
+                    "Successful performances fused into identity",
+                    "Observed successes converted into personal performance trials",
+                    "Setbacks read as skill deficits only"
+                ]
+            },
+            {
+                name: "Persistence",
+                icon: "🚀",
+                description: "The continued or prolonged existence of something",
+                details: [
+                    "Perseverance after affect flatlines",
+                    "Obstacles treated as puzzles",
+                    "Momentum via daily compound actions",
+                    "Self-monitoring of lag/lead indicators"
+                ]
+            },
+            {
+                name: "Moderation",
+                icon: "🎛️",
+                description: "The avoidance of excess or extremes, especially in one's behavior",
+                details: [
+                    "Arousal held in optimal zone",
+                    "Parasympathetic rebound within hours",
+                    "Allocate resources via Pareto principle",
+                    "Ego depletion detected at performance dip"
+                ]
+            },
+            {
+                name: "Self-Reflection",
+                icon: "🪞",
+                description: "The examination of one's own conscious thoughts and feelings",
+                details: [
+                    "Daily introspection",
+                    "Experiences distilled to if-then rule",
+                    "Label current emotion with one word",
+                    "Immediate behavioral calibration"
+                ]
+            }
+        ];
+
+        function createVirtueCard(virtue) {
+            return `
+                <div class="virtue-card" onclick="toggleCard(this)">
+                    <div class="virtue-icon">${virtue.icon}</div>
+                    <h3 class="virtue-title">${virtue.name}</h3>
+                    <p class="virtue-description">${virtue.description}</p>
+                    <div class="virtue-details">
+                        ${virtue.details.map(detail => `<div class="detail-item">${detail}</div>`).join('')}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCard(card) {
+            const details = card.querySelector('.virtue-details');
+            const isActive = card.classList.contains('active');
+            
+            // Close all other cards
+            document.querySelectorAll('.virtue-card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.virtue-details').classList.remove('active');
+            });
+            
+            // Toggle current card
+            if (!isActive) {
+                card.classList.add('active');
+                details.classList.add('active');
+            }
+        }
+
+        // Initialize the grid
+        const grid = document.getElementById('virtuesGrid');
+        grid.innerHTML = virtues.map(virtue => createVirtueCard(virtue)).join('');
+    </script>
+</body>
+</html>
